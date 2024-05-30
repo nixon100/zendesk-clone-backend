@@ -8,7 +8,7 @@ import usersRoute from "./routes/users.js";
 import capstoneRoute from "./routes/Capstone.js"
 import webcodeRoute from "./routes/webcode.js"
 import tasklist from "./routes/task.js"
-import classRoute from "./routes/Class.js"
+import classRoute from "./routes/class.js"
 import interviewRoute from "./routes/interview.js"
 
 const app = express();
