@@ -47,3 +47,28 @@ export const login = async (req, res, next) => {
     next(err);
   }
 };
+export const updateAuth = async (req, res, next) => {
+  console.log(req.body.password)
+  try {
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(req.body.password, salt);
+
+    const newUser = new User({
+      ...req.body,
+      password: hash,
+    });
+
+    // await newUser.save();
+
+
+
+    const updatedHotel = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: newUser },
+      { new: true }
+    );
+    res.status(200).json(updatedHotel);
+  } catch (err) {
+    next(err);
+  }
+};
