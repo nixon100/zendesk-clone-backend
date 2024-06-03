@@ -36,38 +36,30 @@ export const login = async (req, res, next) => {
       process.env.JWT
     );
 
-    const { password, isAdmin, ...otherDetails } = user._doc;
-    res
-      .cookie("access_token", token, {
-        httpOnly: true,
-      })
-      .status(200)
-      .json({ details: { ...otherDetails }, isAdmin });
+    // const { password, isAdmin, ...otherDetails } = user._doc;
+    const {username,password} = req.body
+    res.status(200).json({username,token})
+    // res
+    //   .cookie("access_token", token, {
+    //     httpOnly: true,
+    //   })
+    //   .status(200)
+    //   .json(user);
   } catch (err) {
     next(err);
   }
 };
 export const updateAuth = async (req, res, next) => {
-  console.log(req.body.password)
   try {
     const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(req.body.password, salt);
+    const newPasswordHash = bcrypt.hashSync(req.body.password, salt);
 
-    const newUser = new User({
-      ...req.body,
-      password: hash,
-    });
-
-    // await newUser.save();
-
-
-
-    const updatedHotel = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      { $set: newUser },
+      { $set: { password: newPasswordHash } },
       { new: true }
     );
-    res.status(200).json(updatedHotel);
+    res.status(200).json(updatedUser);
   } catch (err) {
     next(err);
   }
