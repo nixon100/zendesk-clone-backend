@@ -23,7 +23,7 @@ export const register = async (req, res, next) => {
 };
 export const login = async (req, res, next) => {
   try {
-    const user = await User.findOne({ username: req.body.username });
+    const user = await User.findOne({ email: req.body.email });
     if (!user) return next(createError(404, "User not found!"));
 
     const isPasswordCorrect = await bcrypt.compare(
@@ -74,11 +74,11 @@ export const resetPassword = async (req, res) => {
     if (!oldUser) {
       return res.json({ status: "User Not Exists!!" });
     }
-    const secret = process.env.JWT + oldUser.password;
+    const secret = process.env.JWT;
     const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, {
       expiresIn: "5m",
     });
-    const link = `http://localhost:8800/reset-password/${oldUser._id}/${token}`;
+    const link = `http://localhost:3000/reset-password/${oldUser._id}/${token}`;
     var transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -113,9 +113,11 @@ export const resetPassword2 = async (req, res) => {
   if (!oldUser) {
     return res.json({ status: "User Not Exists!!" });
   }
-  const secret = process.env.JWT + oldUser.password;
+  const secret = process.env.JWT;
+  console.log(id,token)
   try {
-    const verify = jwt.verify(token, secret);
+  const verify = jwt.verify(token, secret);
+    
     const encryptedPassword = await bcrypt.hash(password, 10);
     await User.updateOne(
       {
@@ -127,7 +129,7 @@ export const resetPassword2 = async (req, res) => {
         },
       }
     );
-    console.log("verified");
+   res.json("success")
     // res.render("index", { email: verify.email, status: "verified" });
   } catch (error) {
     console.log(error);
