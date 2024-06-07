@@ -4,6 +4,12 @@ import { createError } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import Cookies from "js-cookie";
+// import cookieParser from "cookie-parser"
+// import express from "express";
+// let app = express() 
+// app.use(cookieParser()); 
+ 
 
 export const register = async (req, res, next) => {
   try {
@@ -22,6 +28,8 @@ export const register = async (req, res, next) => {
   }
 };
 export const login = async (req, res, next) => {
+  // Generate a random session ID
+
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user) return next(createError(404, "User not found!"));
@@ -39,18 +47,26 @@ export const login = async (req, res, next) => {
     );
 
     const { password, isAdmin, ...otherDetails } = user._doc;
-    // const {username,password} = req.body
-    res.status(200).json({ ...otherDetails, token });
-    // res
-    //   .cookie("access_token", token, {
-    //     httpOnly: true,
-    //   })
-    //   .status(200)
-    //   .json(user);
+
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      // maxAge: 31536000000 // 1 year
+    })
+      .status(200)
+      .json({ details: { ...otherDetails }, token });
+    // res.status(200).json({ ...otherDetails, token });
+
+    // Cookies.set("access_token", token, { expires: 90 });
+    // const tokenn = Cookies.get("access_token");
+    // res.cookie("userData", token)
+    // .status(200).json({ ...otherDetails, token});
   } catch (err) {
     next(err);
   }
 };
+
+
+
 export const updateAuth = async (req, res, next) => {
   try {
     const salt = bcrypt.genSaltSync(10);
@@ -114,10 +130,10 @@ export const resetPassword2 = async (req, res) => {
     return res.json({ status: "User Not Exists!!" });
   }
   const secret = process.env.JWT;
-  console.log(id,token)
+  console.log(id, token);
   try {
-  const verify = jwt.verify(token, secret);
-    
+    const verify = jwt.verify(token, secret);
+
     const encryptedPassword = await bcrypt.hash(password, 10);
     await User.updateOne(
       {
@@ -129,14 +145,13 @@ export const resetPassword2 = async (req, res) => {
         },
       }
     );
-   res.json("success")
+    res.json("success");
     // res.render("index", { email: verify.email, status: "verified" });
   } catch (error) {
     console.log(error);
     res.json({ status: "Something Went Wrong" });
   }
 };
-
 
 export const resetPassword3 = async (req, res) => {
   const { id, token } = req.params;
@@ -148,11 +163,14 @@ export const resetPassword3 = async (req, res) => {
   const secret = process.env.JWT + oldUser.password;
   try {
     const verify = jwt.verify(token, secret);
-    console.log("not verified")
+    console.log("not verified");
     // res.render("index", { email: verify.email, status: "Not Verified" });
   } catch (error) {
     console.log(error);
     res.send("Not Verified");
   }
 };
-
+export const logout = (req,res)=>{
+  res.clearCookie('access_token'); 
+res.send('user logout successfully');
+}

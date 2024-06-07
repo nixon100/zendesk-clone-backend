@@ -10,6 +10,7 @@ import webcodeRoute from "./routes/webcode.js"
 import tasklist from "./routes/task.js"
 import classRoute from "./routes/class.js"
 import interviewRoute from "./routes/interview.js"
+import tokenRoute from "./routes/CheckToken.js"
 
 const app = express();
 dotenv.config();
@@ -40,6 +41,7 @@ app.use("/api/webcode",webcodeRoute)
 app.use("/api/task",tasklist)
 app.use("/api/class",classRoute)
 app.use("/api/interview",interviewRoute)
+app.use("/checktoken" , tokenRoute)
 
 app.use((err, req, res, next) => {
     const errorStatus = err.status || 500;

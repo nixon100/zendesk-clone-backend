@@ -14,7 +14,7 @@ getSub
 //   updateHotel,
 } from "../controllers/class.js";
 // import Hotel from "../models/Hotel.js";
-// import {verifyAdmin} from "../utils/verifyToken.js"
+import {verifyAdmin,verifyToken} from "../utils/verifyToken.js"
 const router = express.Router();
 
 // //CREATE
