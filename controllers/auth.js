@@ -105,7 +105,7 @@ export const resetPassword = async (req, res) => {
 
     var mailOptions = {
       from: "youremail@gmail.com",
-      to: "vipnixon888@gmail.com",
+      to: email,
       subject: "Password Reset",
       text: link,
     };
