@@ -7,18 +7,27 @@ import nodemailer from "nodemailer";
 import Cookies from "js-cookie";
 // import cookieParser from "cookie-parser"
 // import express from "express";
-// let app = express() 
-// app.use(cookieParser()); 
- 
+// let app = express()
+// app.use(cookieParser());
 
 export const register = async (req, res, next) => {
   try {
     const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(req.body.password, salt);
+    const password = req.body.password;
+    const confirmPassword1 = req.body.confirmpassword;
+
+    if (password !== confirmPassword1) {
+      return res.status(400).send("Passwords do not match");
+    }
+
+    const hashedPassword = bcrypt.hashSync(password, salt);
+
+    // Remove confirmPassword from req.body
+    delete req.body.confirmpassword;
 
     const newUser = new User({
       ...req.body,
-      password: hash,
+      password: hashedPassword
     });
 
     await newUser.save();
@@ -48,10 +57,11 @@ export const login = async (req, res, next) => {
 
     const { password, isAdmin, ...otherDetails } = user._doc;
 
-    res.cookie('access_token', token, {
-      httpOnly: true,
-      // maxAge: 31536000000 // 1 year
-    })
+    res
+      .cookie("access_token", token, {
+        httpOnly: true,
+        // maxAge: 31536000000 // 1 year
+      })
       .status(200)
       .json({ details: { ...otherDetails }, token });
     // res.status(200).json({ ...otherDetails, token });
@@ -64,8 +74,6 @@ export const login = async (req, res, next) => {
     next(err);
   }
 };
-
-
 
 export const updateAuth = async (req, res, next) => {
   try {
@@ -170,7 +178,8 @@ export const resetPassword3 = async (req, res) => {
     res.send("Not Verified");
   }
 };
-export const logout = (req,res)=>{
-  res.clearCookie('access_token'); 
-res.send('user logout successfully');
-}
+export const logout = (req, res) => {
+  res.clearCookie("access_token");
+
+  res.send("user logout successfully");
+};
