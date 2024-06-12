@@ -96,37 +96,42 @@ export const resetPassword = async (req, res) => {
   try {
     const oldUser = await User.findOne({ email });
     if (!oldUser) {
-      return res.json({ status: "User Not Exists!!" });
+      return res.status(404).json({ status: "User Not Found" });
+    } else {
+      const secret = process.env.JWT;
+      const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, {
+        expiresIn: "5m",
+      });
+      const link = `http://localhost:3000/reset-password/${oldUser._id}/${token}`;
+      var transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "nixon6637@gmail.com",
+          pass: process.env.PASS,
+        },
+      });
+
+      var mailOptions = {
+        from: "youremail@gmail.com",
+        to: email,
+        subject: "Password Reset",
+        text: link,
+      };
+
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+          res.status(500).json({ status: "Error sending email" });
+        } else {
+          console.log("Email sent: " + info.response);
+          res.json({ status: "Email sent" });
+        }
+      });
     }
-    const secret = process.env.JWT;
-    const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, {
-      expiresIn: "5m",
-    });
-    const link = `https://zendesk-clone-frontend-3nrvnjq0m-nixons-projects-cfdfac36.vercel.app/reset-password/${oldUser._id}/${token}`;
-    var transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "nixon6637@gmail.com",
-        pass: process.env.PASS,
-      },
-    });
-
-    var mailOptions = {
-      from: "youremail@gmail.com",
-      to: email,
-      subject: "Password Reset",
-      text: link,
-    };
-
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent: " + info.response);
-      }
-    });
-    console.log(link);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status: "Error resetting password" });
+  }
 };
 
 export const resetPassword2 = async (req, res) => {
