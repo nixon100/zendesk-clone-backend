@@ -11,6 +11,8 @@ import tasklist from "./routes/task.js"
 import classRoute from "./routes/class.js"
 import interviewRoute from "./routes/interview.js"
 import tokenRoute from "./routes/CheckToken.js"
+import codekataRoute from "./routes/codekata.js";
+import webkataRoute from "./routes/webkata.js";
 
 const app = express();
 dotenv.config();
@@ -42,6 +44,9 @@ app.use("/api/task",tasklist)
 app.use("/api/class",classRoute)
 app.use("/api/interview",interviewRoute)
 app.use("/checktoken" , tokenRoute)
+app.use("/api/codekata" , codekataRoute)
+app.use("/api/webkata" , webkataRoute)
+
 
 app.use((err, req, res, next) => {
     const errorStatus = err.status || 500;
