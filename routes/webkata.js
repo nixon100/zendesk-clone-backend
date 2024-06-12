@@ -2,7 +2,9 @@ import express from "express";
 import {
 //   countByCity,
 //   countByType,
-countBySub
+countBySub,
+totalmark,
+Prjsubmit
 //   Prjsubmit,
 //   updateHotel,
 //   deleteHotel,
@@ -30,6 +32,8 @@ const router = express.Router();
 
 
 router.get("/submission", countBySub)
+router.get("/total", totalmark)
+router.post("/submission", Prjsubmit);
 // router.post("/submission", Prjsubmit);
 // router.get("/submission", getSub);
 
