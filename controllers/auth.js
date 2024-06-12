@@ -102,12 +102,12 @@ export const resetPassword = async (req, res) => {
     const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, {
       expiresIn: "5m",
     });
-    const link = `https://zendesk-clone-frontend-3nrvnjq0m-nixons-projects-cfdfac36.vercel.app/${oldUser._id}/${token}`;
+    const link = `https://zendesk-clone-frontend-3nrvnjq0m-nixons-projects-cfdfac36.vercel.app/reset-password/${oldUser._id}/${token}`;
     var transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: "nixon6637@gmail.com",
-        pass: "fcgr jwte qgpn uqaa",
+        pass: process.env.PASS,
       },
     });
 
